@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+
+body {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #222;
+  background: #e7f0fd;
+  font-weight: 600;
+  font-family: serif;
+  margin: 0px; }
+
+.main {
+  padding: 150px 0;
+  position: relative; }
+
+h1 {
+  position: absolute;
+  font-weight: 700;
+  font-size: 174px;
+  color: #fff;
+  opacity: 0.5;
+  right: 105px;
+  top: 45px;
+  top: -149px;
+  z-index: 9; }
+
+.container {
+  width: 520px;
+  background: #fff;
+  margin: 0 auto;
+  box-shadow: 0px 10px 9.9px 0.1px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+    }
+
+.sign-up-content {
+  padding: 40px 60px 32px 60px;
+  position: relative;
+  z-index: 99; }
+
+.form-radio {
+  margin: 0 -10px;
+  margin-bottom: 40px; }
+    
+  .form-radio input {
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: -9999px; }
+    
+  .form-radio input + label {
+    margin: 0 8px;
+    padding: 11px 31px;
+    box-sizing: border-box;
+    position: relative;
+    display: inline-block;
+    border: solid 2px #ebebeb;
+    background-color: #FFF;
+    font-size: 14px;
+    font-weight: 600;
+    color: #888;
+    text-align: center;
+    transition: border-color .15s ease-out,  color .25s ease-out,  background-color .15s ease-out, box-shadow .15s ease-out;
+    border-radius: 5px;
+   }
+  .form-radio input:checked + label {
+    background-color: #1da0f2;
+    color: #FFF;
+    border-color: #1da0f2;
+    z-index: 1; }
+
+
+input {
+  border: solid 2px #ebebeb;
+  box-sizing: border-box;
+  width: 100%;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: serif;
+  padding: 16px 30px 16px 140px; }
+
+.form-textbox {
+  position: relative; }
+  .form-textbox label {
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    font-weight: 600;
+    color: #888;
+    font-size: 14px; }
+    
+#pass {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px; }
+
+#email {
+  border: none;
+  border-left: solid 2px #ebebeb;
+  border-right: solid 2px #ebebeb; }
+
+.submit {
+  background: #1da0f2;
+  color: #FFF;
+  border: none;
+  padding: 15px 20px;
+  font-size: 13px;
+  font-family: serif;
+  border-radius: 5px;
+}
+  .submit:hover {
+    background: #0c85d0; }
+
+.loginhere {
+  text-align: center;
+  color: #888;
+  margin-top: 63px; }
+
+.loginhere-link {
+  color: #1da0f2;
+  text-decoration: none; }
+  .loginhere-link:hover {
+    text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="main">
+
+        <h1>Sign IN</h1>
+        <div class="container">
+            <div class="sign-up-content">
+                <form method="POST" class="signup-form">
+                    <h2 class="form-title">User Log In Page</h2>
+                    <div class="form-radio">
+                        <input type="radio" name="member_level" value="newbie" id="newbie" checked="checked" />
+                        <label for="newbie">SignIn</label>
+
+                        <input type="radio" name="member_level" value="average" id="average" />
+                        <label for="average">SignUP</label>
+
+                    </div>
+
+                    <div class="form-textbox">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" />
+                    </div>
+
+                    <div class="form-textbox">
+                        <label for="pass">Password</label>
+                        <input type="password" name="pass" id="pass" pattern="(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Password Incorret"/>
+                    </div>
+
+
+                    <div class="form-textbox">
+                        <input type="submit" name="submit" id="submit" class="submit" value="LogIn" />
+                    </div>
+                </form>
+
+                <p class="loginhere">
+                    Don'T have an account ?<a href="#" class="loginhere-link"> Sign Up</a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
