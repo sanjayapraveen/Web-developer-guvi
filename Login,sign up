@@ -1,0 +1,309 @@
+login :
+
+<div id="login-dialog" title="Login Dialog Form" style="display: none;">
+    <form id="login-form" action="" method="post" role="form">
+        <div class="input-row">
+            <span id="email-info"></span> <input type="email"
+                name="login-email-id" id="login-email-id"
+                class="input-field" placeholder="Email ID">
+        </div>
+        <div class="input-row">
+            <span id="password-info"></span> <input type="password"
+                name="login-password" id="login-password"
+                class="input-field" placeholder="Password">
+        </div>
+        <input type="button" class="btn-submit" value="Log In"
+            onclick="ajaxLogin()">
+    </form>
+
+    <div class="success-message" id="login-success-message"
+        style="display: none"></div>
+    <div class="error-message" id="login-error-message"
+        style="display: none"></div>
+    <div id="ajaxloader" style="display: none">
+        <img src="LoaderIcon.gif" id="loaderId" />
+    </div>
+</div>
+
+sign up:
+
+<div id="register-dialog" class="register-class"
+    title="Registration Dialog Form" style="display: none;">
+    <form id="register-form" action="" method="post" role="form">
+        <div class="input-row">
+            <span id="first-name-info"></span> <input type="text"
+                name="first-name" id="first-name" class="input-field"
+                placeholder="First Name" value="">
+        </div>
+        <div class="input-row">
+            <span id="last-name-info"></span> <input type="text"
+                name="last-name" id="last-name" class="input-field"
+                placeholder="Last Name" value="">
+        </div>
+        <div class="input-row">
+            <span id="register-email-info"></span> <input type="email"
+                name="register-email-id" id="register-email-id"
+                class="input-field" placeholder="Email ID" value="">
+        </div>
+        <div class="input-row">
+            <span id="contact-no-info"></span> <input type="text"
+                name="contact-number" id="contact-number" maxlength="10"
+                class="input-field" placeholder="Contact Number">
+        </div>
+        <div class="input-row">
+            <span id="register-passwd-info"></span> <input
+                type="password" name="register-password"
+                id="register-password" class="input-field"
+                placeholder="Password">
+        </div>
+        <div class="input-row">
+            <span id="confirm-passwd-info"></span> <input
+                type="password" name="confirm-password"
+                id="confirm-password" class="input-field"
+                placeholder="Confirm Password">
+        </div>
+        <div class="submit-button">
+            <input type="button" class="btn-submit" value="Register"
+                onclick="ajaxRegistration()">
+        </div>
+
+    </form>
+
+    <div class="success-message" id="register-success-message"
+        style="display: none"></div>
+    <div class="error-message" id="register-error-message"
+        style="display: none"></div>
+
+</div>
+
+ajax login-signup PHP:
+
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+session_start();
+require_once ('db.php');
+
+function validateData($data)
+{
+    $resultData = htmlspecialchars(stripslashes(trim($data)));
+    return $resultData;
+}
+
+if (isset($_POST['action']) && $_POST['action'] == 'registration') {
+    $first_name = validateData($_POST['firstName']);
+    $last_name = validateData($_POST['lastName']);
+    $email_id = validateData($_POST['emailId']);
+    $contact_number = validateData($_POST['contactNumber']);
+    $password = validateData($_POST['password']);
+    $confirm_password = validateData($_POST['confirmPassword']);
+    
+    $error_message = '';
+    $checkEmailQuery = $conn->prepare("select * from tbl_registration where email_id = ?");
+    $checkEmailQuery->bind_param("s", $email_id);
+    $checkEmailQuery->execute();
+    
+    $result = $checkEmailQuery->get_result();
+    if ($result->num_rows > 0) {
+        
+        $error_message = "Email ID already exists !";
+        echo $error_message;
+    } else {
+        $insertQuery = $conn->prepare("insert into tbl_registration(first_name,last_name,email_id,contact_number,password) values(?,?,?,?,?)");
+        $password = md5($password);
+        $insertQuery->bind_param("sssss", $first_name, $last_name, $email_id, $contact_number, $password);
+        
+        if ($insertQuery->execute()) {
+            echo "Thankyou for registering with us. You can login now.";
+            exit();
+        } else {
+            $error_message = "error";
+        }
+        $insertQuery->close();
+        $conn->close();
+        
+        echo $error_message;
+    }
+}
+
+if (isset($_POST['action']) && $_POST['action'] == 'login') {
+    $emailId = validateData($_POST['emailId']);
+    $password = validateData($_POST['password']);
+    $password = md5($password);
+    $error_message = '';
+    
+    $selectQuery = $conn->prepare("select * from tbl_registration where email_id = ? and password = ?");
+    $selectQuery->bind_param("ss", $emailId, $password);
+    $selectQuery->execute();
+    
+    $result = $selectQuery->get_result();
+    
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $_SESSION['username'] = $row['first_name'] . " " . $row['last_name'];
+            require_once "dashboard.php";
+            exit();
+        } // endwhile
+    } // endif
+else {
+        $error_message = "error";
+    } // endElse
+    $conn->close();
+    
+    echo $error_message;
+}
+?>
+
+JS code:
+
+function validateEmailId(input) {
+	var emailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+	if (emailFormat.test(input)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function pregMatch(input) {
+	var regExp = /^[a-zA-Z ]*$/;
+
+	if (regExp.test(input)) {
+		return true;
+	} else {
+		return false
+	}
+}
+
+function ajaxRegistration() {
+	$(".error").text("");
+	$('#first-name-info').removeClass("error");
+	$('#last-name-info').removeClass("error");
+	$('#register-email-info').removeClass("error");
+	$('#contact-no-info').removeClass("error");
+	$('#register-passwd-info').removeClass("error");
+	$('#confirm-passwd-info').removeClass("error");
+
+	var firstName = $('#first-name').val();
+	var lastName = $('#last-name').val();
+	var emailId = $('#register-email-id').val();
+	var contactNumber = $('#contact-number').val();
+	var password = $('#register-password').val();
+	var confirmPassword = $('#confirm-password').val();
+	var actionString = 'registration';
+
+	if (firstName == "") {
+		$('#first-name-info').addClass("error");
+		$(".error").text("required");
+	} else if (!pregMatch(firstName)) {
+		$('#first-name-info').addClass("error");
+		$(".error").text('Alphabets and white space allowed');
+	} else if (lastName == "") {
+		$('#last-name-info').addClass("error");
+		$(".error").text("required");
+
+	} else if (!pregMatch(lastName)) {
+		$('#last-name-info').addClass("error");
+		$(".error").text('Alphabets and white space allowed');
+	} else if (emailId == "") {
+		$('#register-email-info').addClass("error");
+		$(".error").text("required");
+	} else if (!validateEmailId(emailId)) {
+		$('#register-email-info').addClass("error");
+		$(".error").text("Invalid");
+	} else if (contactNumber == "") {
+		$('#contact-no-info').addClass("error");
+		$(".error").text("required");
+	} else if (isNaN(contactNumber) || (contactNumber.indexOf(" ") != -1) || contactNumber.length > 10) {
+		$('#contact-no-info').addClass("error");
+		$(".error").text("Invalid");
+	} else if (password == "") {
+		$('#register-passwd-info').addClass("error");
+		$(".error").text("required");
+	} else if (confirmPassword == "") {
+		$('#confirm-passwd-info').addClass("error");
+		$(".error").text("required");
+	} else if (password != confirmPassword) {
+		$('#confirm-passwd-info').addClass("error");
+		$(".error").text("Your confirm password does not match.");
+	} else {
+		$('#loaderId').show();
+		$.ajax({
+			url : 'ajax-login-registration.php',
+			type : 'POST',
+			data : {
+				firstName : firstName,
+				lastName : lastName,
+				emailId : emailId,
+				contactNumber : contactNumber,
+				password : password,
+				confirmPassword : confirmPassword,
+				action : actionString
+			},
+			success : function(response) {
+				if (response.trim() == 'error') {
+					$('#register-success-message').hide();
+					$('#ajaxloader').hide();
+					$('#register-error-message').html(
+							"Invalid Attempt. Try Again.");
+					$('#register-error-message').show();
+				} else {
+					$(".thank-you-registration").show();
+					$(".thank-you-registration").text(response);
+					$("#register-dialog").dialog("close");
+				}
+			}
+
+		});
+		this.close();
+	}// endif
+}
+
+// Function for user login
+function ajaxLogin() {
+	$(".error").text("");
+	$('#email-info').removeClass("error");
+	$('#password-info').removeClass("error");
+
+	var emailId = $('#login-email-id').val();
+	var password = $('#login-password').val();
+	var actionString = 'login';
+
+	if (emailId == "") {
+		$('#email-info').addClass("error");
+		$(".error").text("required");
+	} else if (!validateEmailId(emailId)) {
+		$('#email-info').addClass("error");
+		$('.error').text("Invalid");
+	} else if (password == "") {
+		$('#password-info').addClass("error");
+		$(".error").text("required");
+	} else {
+		// show loader
+		$('#loaderId').show();
+		$.ajax({
+			url : 'ajax-login-registration.php',
+			type : 'POST',
+			data : {
+				emailId : emailId,
+				password : password,
+				action : actionString
+			},
+			success : function(response) {
+				if (response.trim() == 'error') {
+					$('#login-success-message').hide();
+					$('#ajaxloader').hide();
+					$('#login-error-message').html(
+							"Invalid Attempt. Try Again.");
+					$('#login-error-message').show();
+				} else {
+					$('.demo-container').html(response);
+					//register_window.dialog("close");
+					$("#login-dialog").dialog("close");
+				}
+			}
+		});
+		this.close();
+	}// endif
+}
