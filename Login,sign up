@@ -1,0 +1,331 @@
+login.html:
+
+<?php
+include "db.php";
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ajax Signup</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/materia/bootstrap.min.css">
+</head>
+<body>
+  <div class="container">
+  <div class="row">
+  <div class="col-md-5 mx-auto mt-5">
+  <?php if(isset($_SESSION['created'])): ?>
+    <div class="alert alert-success">
+    <?php echo $_SESSION['created']; ?>
+    </div>
+<?php endif; ?>
+<?php unset($_SESSION['created']); ?>
+  <div class="card">
+  <div class="card-header">
+  <h3>Login User</h3>
+  </div>
+  <div class="card-body">
+  <form>
+  <div class="form-group">
+  <div class="form-group">
+  <input type="email" id="email" class="form-control email" placeholder="Email">
+  <div class="invalid-feedback emailError" style="font-size:16px;">Email is required</div>
+  </div>
+  <!-- Close form-group -->
+  <div class="form-group">
+  <input type="password" id="password" class="form-control password" placeholder="Password">
+  <div class="invalid-feedback passwordError" style="font-size:16px;">Password is required</div>
+  </div>
+  <!-- Close form-group -->
+  <div class="form-group">
+   <button type="button" id="login" class="btn btn-info">Login &rarr;</button>
+   <a href="index.php" style="float:right;margin-top:10px;">Create new account</a>
+  </div>
+  <!-- Close form-group -->
+  </form>
+  </div>
+  <!-- Close card-body -->
+  </div>
+  <!-- Close card -->
+  </div>
+  <!-- Close col-md-5 -->
+  </div>
+  <!-- Close row -->
+  </div>
+  <!-- Close container -->
+
+   <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script> 
+   <script src="app.js"></script>
+</body>
+</html>
+
+signup.html:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ajax Signup</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/materia/bootstrap.min.css">
+</head>
+<body>
+  <div class="container">
+  <div class="row">
+  <div class="col-md-5 mx-auto mt-5">
+  <div class="card">
+  <div class="card-header">
+  <h3>Signup User</h3>
+  </div>
+  <div class="card-body">
+  <form>
+  <div class="form-group">
+  <input type="text" id="name" class="form-control name" placeholder="Name">
+  <div class="invalid-feedback" style="font-size:16px;">Name is required</div>
+  </div>
+  <!-- Close form-group -->
+  <div class="form-group">
+  <input type="email" id="email" class="form-control email" placeholder="Email">
+  <div class="invalid-feedback emailError" style="font-size:16px;">Email is required</div>
+  </div>
+  <!-- Close form-group -->
+  <div class="form-group">
+  <input type="password" id="password" class="form-control password" placeholder="Password">
+  <div class="invalid-feedback" style="font-size:16px;">Password is required</div>
+  </div>
+  <!-- Close form-group -->
+  <div class="form-group">
+   <button type="button" id="signup" class="btn btn-info">Signup &rarr;</button>
+   <a href="login.php" style="float:right;margin-top:10px;">Already have an account ?</a>
+  </div>
+  <!-- Close form-group -->
+  </form>
+  </div>
+  <!-- Close card-body -->
+  </div>
+  <!-- Close card -->
+  </div>
+  <!-- Close col-md-5 -->
+  </div>
+  <!-- Close row -->
+  </div>
+  <!-- Close container -->
+
+   <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script> 
+   <script src="app.js"></script>
+</body>
+</html>
+
+app.js:
+
+$(document).ready(function(){
+  
+    $("#signup").click(function(){
+        const name = $("#name").val();
+        const email = $("#email").val();
+        const password = $("#password").val();
+        if(name.length == ""){
+            $(".name").addClass("is-invalid");
+        } else {
+            $(".name").removeClass("is-invalid");
+        }
+
+        if(email.length == ""){
+            $(".email").addClass("is-invalid");
+        } else {
+            $(".email").removeClass("is-invalid");
+        }
+
+        if(password.length == ""){
+            $(".password").addClass("is-invalid");
+        } else {
+            $(".password").removeClass("is-invalid");
+        }
+
+        if(name.length != "" && email.length != "" && password.length != ""){
+            $.ajax({
+              type: "POST",
+              url : "signup.php",
+              data : {"name": name, "email": email, 'password': password},
+              dataType: 'JSON',
+              success : function(feedback){
+                  if(feedback.status === "error"){
+                      $(".email").addClass("is-invalid");
+                      $(".emailError").html(feedback.message);
+                  } else if(feedback.status === "success"){
+                       window.location = "login.php";
+                  }
+              }
+            })
+        }
+    })
+
+
+    // User login
+
+
+    $("#login").click(function(){
+        const email = $("#email").val();
+        const password = $("#password").val();
+        if(email.length == ""){
+            $(".email").addClass("is-invalid");
+        } else {
+            $(".email").removeClass("is-invalid");
+        }
+
+        if(password.length == ""){
+            $(".password").addClass("is-invalid");
+        } else {
+            $(".password").removeClass("is-invalid");
+        }
+
+        if(email.length != "" && password.length != ""){
+            $.ajax({
+                type : 'POST',
+                url  : 'userLogin.php',
+                data : {'email': email, 'password': password},
+                dataType : 'JSON',
+                success : function(feedback){
+                    if(feedback.status === "success"){
+                        window.location = "profile.php";
+                    } else if(feedback.status === "passwordError"){
+                        $(".password").addClass("is-invalid");
+                        $(".passwordError").html(feedback.message);
+                        $(".email").removeClass("is-invalid");
+                        $(".emailError").html("");
+                    } else if(feedback.status === "emailError"){
+                        $(".password").removeClass("is-invalid");
+                        $(".passwordError").html("");
+                        $(".email").addClass("is-invalid");
+                        $(".emailError").html(feedback.message);
+                    }
+                }
+            })
+        }
+    })
+
+})
+
+db.php:
+
+<?php
+session_start();
+
+$db = new PDO("mysql:host=localhost;dbname=example", "root", "");
+
+
+?>
+
+signup.php:
+
+<?php
+include "db.php";
+
+if(isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])){
+
+
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
+
+    $checkEmail = $db->prepare("SELECT email FROM users WHERE email = ?");
+    $checkEmail->execute([$email]);
+    if($checkEmail->rowCount() > 0 ){
+        echo json_encode(['status' => 'error', 'message' => 'Sorry this email is already taken']);
+    } else {
+     $Query = $db->prepare("INSERT INTO users (name, email, password) VALUES (?,?,?)");
+     $Query->execute([$name, $email, $password]);
+     if($Query){
+         $_SESSION['created'] = "Your account has been created successfully";
+         echo json_encode(['status' => 'success']);
+     }
+    }
+
+}
+
+login.php:
+<?php
+include "db.php";
+
+if(isset($_POST['email']) && isset($_POST['password'])){
+
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
+
+    $Query = $db->prepare("SELECT * FROM users WHERE email = ?");
+    $Query->execute([$email]);
+    if($Query->rowCount() > 0 ){
+    $row = $Query->fetch(PDO::FETCH_OBJ);
+    $dbPassword = $row->password;
+    $name = $row->name;
+    $id = $row->id;
+    if(password_verify($password, $dbPassword)){
+        $_SESSION['id'] = $id;
+        $_SESSION['name'] = $name;
+        echo json_encode(['status' => 'success']);
+    } else {
+        echo json_encode(['status' => 'passwordError', 'message' => 'Your Password is wrong']);
+    }
+    } else {
+        echo json_encode(['status' => 'emailError', 'message' => 'Your email is wrong']);
+    }
+
+}
+
+profile.php:
+
+<?php
+include "db.php";
+if(!isset($_SESSION['id'])):
+  header("location: login.php");
+endif;
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ajax Signup</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/materia/bootstrap.min.css">
+</head>
+<body>
+  <div class="container">
+  <div class="row">
+   <div class="col-md-12">
+   <div class="jumbotron">
+  <h1 class="display-3">Hello, <?php echo $_SESSION['name']; ?></h1>
+  <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+  <hr class="my-4">
+  <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+  <p class="lead">
+    <a class="btn btn-primary btn-lg" href="logout.php" role="button">Logout</a>
+  </p>
+</div>
+   </div>
+  </div>
+  <!-- Close row -->
+  </div>
+  <!-- Close container -->
+
+   <script src="jquery.min.js"></script> 
+   <script src="app.js"></script>
+</body>
+</html>
+
+logout.php:
+
+<?php
+session_start();
+session_destroy();
+header("location: login.php");
+
